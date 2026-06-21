@@ -21,3 +21,6 @@ Normal html with js projects need script tags in html file. In React you will no
 It's React-scripts package (can be seen in package.json) that takes your code and transform it behind the scenes. It one of things is injecting sript tags to html file.
 ![alt text](images/image-2.png)
 
+In React during import statements you omit extension of a file (as opposed in raw js where typically '.js' should be added to file name).
+
+To use import and export in js file you would need to add attribute 'type="module"' to script tag in html file, but react's auto-injected script tags do not have them. That's because build process will merge those seperate files you have during development into one big file (or a bunch of big files) imported with old-school syntax in the right order. This is made to make this code execute in browsers that do not support this import-export syntax.
