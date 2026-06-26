@@ -4,6 +4,10 @@
 - [2. JavaScript refresher](#2-javascript-refresher)
 - [3. React Essentials](#3-react-essentials)
   - [3.1. Components](#31-components)
+  - [3.2. index.jsx](#32-indexjsx)
+  - [3.3. Built-in vs custom components](#33-built-in-vs-custom-components)
+  - [3.4. Dynamic values inside JSX](#34-dynamic-values-inside-jsx)
+  - [3.5. Loading images](#35-loading-images)
 
 
 # 1. Setuping react project
@@ -32,3 +36,29 @@ To use import and export in js file you would need to add attribute 'type="modul
 Reusable building blocks.
 ![creating-components](images/image-3.png)
 ![why-components](images/image-4.png)
+![jsx](images/image-5.png)
+
+Component is a really just a JavaScript function. But to be recognised as a component by a React it must follow two rules:
+1. Name starts with uppercase character
+2. It returns a "Renderable" content
+
+![component-signature-rules](images/image-6.png)
+
+In JS u would use a function `function Header() {}` by executing it `Header()` but that's not how you use components in React. You can use your function as regular HTML element inside JSX code `<Header></Header>`. You could also use self-closing syntax `<Header />`.
+
+## 3.2. index.jsx
+_index.jsx_ file acts as a main entry point of React App since it is the first file to be loaded by the HTML file. ReactDOM library (which we import in this file) renders this app component. It is responsible of putting App component contents on the screen. It is rendered by passing jsx code to the `render` method. This `render` method is called on a object that's created by another method (`createRoot` method). `createRoot` method takes existing HTML element as an input (so an element that's not being created by a React, but rather is in _index.html_ file already). So `render` method takes component and renders it inside HTML element.
+![index.jsx](images/image-7.png)
+![root-component](images/image-8.png)
+![component-hierarchy](images/image-9.png)
+
+## 3.3. Built-in vs custom components
+![built-in-vs-custom-components](images/image-10.png)
+
+## 3.4. Dynamic values inside JSX
+To place a dynamic value in JSX you need to use curly braces `{}`.
+
+## 3.5. Loading images
+You shouldnt use standard `<img src="path/to/image" alt="image description" />`.
+
+Instead you should use import with relative path to this file `import reactImg from './assets/image-name.png'`
