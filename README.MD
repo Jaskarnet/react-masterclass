@@ -8,6 +8,7 @@
   - [3.3. Built-in vs custom components](#33-built-in-vs-custom-components)
   - [3.4. Dynamic values inside JSX](#34-dynamic-values-inside-jsx)
   - [3.5. Loading images](#35-loading-images)
+  - [3.6. Props](#36-props)
 
 
 # 1. Setuping react project
@@ -61,4 +62,27 @@ To place a dynamic value in JSX you need to use curly braces `{}`.
 ## 3.5. Loading images
 You shouldnt use standard `<img src="path/to/image" alt="image description" />`.
 
-Instead you should use import with relative path to this file `import reactImg from './assets/image-name.png'`
+Instead you should use import with relative path to this file `import reactImg from './assets/image-name.png'` and then inside JSX `<img src={reactImg} alt="Image description" />`.
+
+## 3.6. Props
+React allows you to pass data to components. via a concept called **props**.
+The parameters in function signature of components are what in React is called props. They are called with the value taken from JSX tag attributes, fe: 
+```html
+<CoreConcept
+  title="Components"
+  description="The core UI building block."
+  image={componentsImg}
+/>
+``` 
+```JSX
+function CoreConcept(props) {
+  return (
+    <li>
+      <img src={props.image} alt="">
+        <h3>props.title</h3>
+        <p>props.description</p>
+      </img>
+    </li>
+  );
+}
+```
