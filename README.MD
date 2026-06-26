@@ -2,6 +2,8 @@
 
 - [1. Setuping react project](#1-setuping-react-project)
 - [2. JavaScript refresher](#2-javascript-refresher)
+- [3. React Essentials](#3-react-essentials)
+  - [3.1. Components](#31-components)
 
 
 # 1. Setuping react project
@@ -24,3 +26,9 @@ It's React-scripts package (can be seen in package.json) that takes your code an
 In React during import statements you omit extension of a file (as opposed in raw js where typically '.js' should be added to file name).
 
 To use import and export in js file you would need to add attribute 'type="module"' to script tag in html file, but react's auto-injected script tags do not have them. That's because build process will merge those seperate files you have during development into one big file (or a bunch of big files) imported with old-school syntax in the right order. This is made to make this code execute in browsers that do not support this import-export syntax.
+
+# 3. React Essentials
+## 3.1. Components
+Reusable building blocks.
+![creating-components](images/image-3.png)
+![why-components](images/image-4.png)
