@@ -9,6 +9,10 @@
   - [3.4. Dynamic values inside JSX](#34-dynamic-values-inside-jsx)
   - [3.5. Loading images](#35-loading-images)
   - [3.6. Props](#36-props)
+  - [3.7. Project Structure](#37-project-structure)
+  - [3.8. Component composition - special `children` prop](#38-component-composition---special-children-prop)
+  - [3.9. Reacting to events](#39-reacting-to-events)
+    - [3.9.1. `onClick` prop](#391-onclick-prop)
 
 
 # 1. Setuping react project
@@ -86,3 +90,37 @@ function CoreConcept(props) {
   );
 }
 ```
+
+## 3.7. Project Structure
+Best practice is to store one component per file. Those files are usually stored in a _components_ subfolder of _src_ folder. The convention is to name those files the same name as the component name that will be stored in that file. Most of the time exporting is done using `default` keyword. 
+
+Css files related to components should have the same name as the component file and put in the same folder. They are then imported in a related component file.
+
+Be careful as those styles in css file are **NOT** scoped only to this component. Splitting the css code into the component specific css files can still make sense since it makes it easy to see which style SHOULD relate to which component, making adjusting those styles easier.
+(There is a solotion to this potential problem. Later in course.)
+
+There is an option to create a folder for each group of files related to component, named the same as component file. This is not required and comes down to personal preference.
+
+## 3.8. Component composition - special `children` prop
+React by default ignores in put between opening and closing component tags. To use something like `<TabButton>Components</TabButton>` you need to add parameter (usually called props) to a component function signature as usual. There is a special built-in children prop (`props.children`). This children prop simply refers to the content between component tags.
+
+## 3.9. Reacting to events
+In vanilla JS to react to event for a button click you would do something like this `document.querySelector('button').addEventListener('click', () => {})`.
+
+In a React project we don't want to write imperative code like this, instead we want to write declarative code. You can do that by adding special attribute (special prop) to elements.
+
+There are many special props which name starts with `on`. Their value is always a funcion.
+
+The function name convention for special prop is to use *handle* + *name of the event* (e.g.: `handleClick`). Another common option is to call it *name of the event* + *Handler* (e.g.: `clickHandler`)
+
+### 3.9.1. `onClick` prop
+```jsx
+export default function TabButton({children}) {
+    function handleClick() {
+        console.log('Hello World!');
+    }
+
+    return <li><button onClick={handleClick}>{children}</button></li>
+}
+```
+
