@@ -20,13 +20,21 @@
     - [3.11.3. Using variables](#3113-using-variables)
   - [3.12. CSS styling and dynamic styling](#312-css-styling-and-dynamic-styling)
   - [3.13. Outputting list data automatically](#313-outputting-list-data-automatically)
-- [4. React behind the scenes - optimization techniques](#4-react-behind-the-scenes---optimization-techniques)
-  - [4.1. How does React update the DOM?](#41-how-does-react-update-the-dom)
-  - [4.2. Optimization](#42-optimization)
-    - [4.2.1. `React.memo()`](#421-reactmemo)
-    - [4.2.2. Avoid component function executions with clever structuring](#422-avoid-component-function-executions-with-clever-structuring)
-    - [4.2.3. `useCallback()` hook](#423-usecallback-hook)
-    - [4.2.4. `React.useMemo()`](#424-reactusememo)
+- [4. React Essentials - Deep Dive](#4-react-essentials---deep-dive)
+  - [4.1. You don't have to use JSX](#41-you-dont-have-to-use-jsx)
+  - [4.2. Working with Fragments](#42-working-with-fragments)
+  - [4.3. When should you split components?](#43-when-should-you-split-components)
+  - [4.4. Props are not forwarded automatically](#44-props-are-not-forwarded-automatically)
+  - [4.5. Multiple JSX slots](#45-multiple-jsx-slots)
+  - [4.6. Setting component types dynamically](#46-setting-component-types-dynamically)
+  - [4.7. Setting default prop values](#47-setting-default-prop-values)
+- [5. React behind the scenes - optimization techniques](#5-react-behind-the-scenes---optimization-techniques)
+  - [5.1. How does React update the DOM?](#51-how-does-react-update-the-dom)
+  - [5.2. Optimization](#52-optimization)
+    - [5.2.1. `React.memo()`](#521-reactmemo)
+    - [5.2.2. Avoid component function executions with clever structuring](#522-avoid-component-function-executions-with-clever-structuring)
+    - [5.2.3. `useCallback()` hook](#523-usecallback-hook)
+    - [5.2.4. `React.useMemo()`](#524-reactusememo)
 
 # 1. Setuping react project
 
@@ -254,7 +262,7 @@ In standard html to change declare class you would use `class` prop. But there i
 As React can output array of JSX elements but not array of js objects, we need to transform them to JSX elements. We can achieve that by using `Arrays.map()` method.
 
 ```jsx
-// inside renerable content
+// inside renderable content
 {
   CORE_CONCEPTS.map((conceptItem) => (
     <CoreConcept {...conceptItem} key={conceptItem.title} />
@@ -264,15 +272,128 @@ As React can output array of JSX elements but not array of js objects, we need t
 
 When dynamically outputting a list of elements, every element should receive a unique "key" to help React tell the list items apart.
 
-# 4. React behind the scenes - optimization techniques
+# 4. React Essentials - Deep Dive
 
-## 4.1. How does React update the DOM?
+## 4.1. You don't have to use JSX
+
+As a React developer you should know that in theory you could build React apps without using JSX and therefore without need of special build process. Vast majority of React projects use JSX though.
+
+![you-don't-need-jsx](images/image-13.png)
+
+## 4.2. Working with Fragments
+
+JSX expressions must have one parent element. That's because in the end JSX is syntactic sugar over `React.createElement` function which expects one argument. That's why there's often a need to wrap sibling elements in opening and closig div tags. This limitation means that you do end up with empty div in your DOM structure.
+
+That's why there's an alternative. There is a wrapper if u do need a root component to wrap some sibling components, but you dont want to render an actual element to the screen. For this you can import Fragment component like this:
+
+```jsx
+import { Fragment } from "react";
+```
+
+and use it instead of div as a wrapper for renderable content.
+
+Modern React projects use even shorter alternative. There you don't even need to import Fragment. You just use empty tags as a wrapper, so end code would look like this:
+
+```jsx
+return {
+  <>
+    <Header />
+    <main>
+    </main>
+  </>
+}
+```
+
+## 4.3. When should you split components?
+
+Put different features into different components.
+If you managing the state of the inner component, then you probabli want to split up.
+
+## 4.4. Props are not forwarded automatically
+
+![props-are-not-forwarded-automatically](images/image-14.png)
+
+To solve this problem we could in component function accept all of the needed attributes and forward them manually. That can cause a lot of manual work and isn't really scalable.
+
+We can use a pattern called **Forwarded Props** or **Proxy Props**.
+
+It is used using standard JS **rest property** (`...`) at the end of component function parameters declaration. This syntax group all remaining object properties into a new object. It is usually named _props_.
+
+It is a usefull pattern when building wrapper components.
+
+## 4.5. Multiple JSX slots
+
+As we know we can use special `children` prop to access JSX within opening and closing tag of our component. But it isn't the only place where JSX code is accepted. Actually any prop can take JSX code so we can use it in dumb component to enforce some kind of structure without being overly specific:
+
+```jsx
+export default function Tabs({ children, buttons }) {
+  return (
+    <>
+      <menu>{buttons}</menu>
+      {children}
+    </>
+  );
+}
+```
+
+## 4.6. Setting component types dynamically
+
+You can make a prop that will represent the type of inner component in your returned renderable content. This prop takes component identifier. Custom components must be passed as a dynamic value (enclosed with `{}`, e.g.: `{Section}`) and built-in components must be passed as a string (enclosed with `""`, e.g.: `"menu"`).
+
+Component with dynamic inner component types would look like this:
+
+```jsx
+export default function Tabs({ children, buttons, buttonsContainer }) {
+  const ButtonsContainer = buttonsContainer;
+  return (
+    <>
+      <ButtonsContainer>{buttons}</ButtonsContainer>
+      {children}
+    </>
+  );
+}
+```
+
+Important thing there is that we can't use `buttonsContainer` prop directly as a tag name as it starts with lowercase letter, and that would mean in JSX to look for a built-in componenent `buttonsContainer` which doesnt't exists. Thus we create const with name starting with uppercase letter and use it in a tag instead. We could of course take a shortcut and just name this prop with leading uppercase character.
+
+Then we would use it like this with custom component:
+
+```jsx
+<Tabs buttonsContainer={Section}></Tabs>
+```
+
+or like that with built-in component:
+
+```jsx
+<Tabs buttonsContainer="menu"></Tabs>
+```
+
+## 4.7. Setting default prop values
+
+Just like in JS.
+
+ButtonsContainer example:
+
+```jsx
+export default function Tabs({ children, buttons, ButtonsContainer = "menu" }) {
+  return (
+    <>
+      <ButtonsContainer>{buttons}</ButtonsContainer>
+      {children}
+    </>
+  );
+}
+```
+
+# 5. React behind the scenes - optimization techniques
+
+## 5.1. How does React update the DOM?
 
 It updates from top to bottom of the tree. The App component is usally the top component. If any custom component is in renderable JSX part of it then it will render (execute component function) of this component as well and so on.
 
-## 4.2. Optimization
+## 5.2. Optimization
 
-### 4.2.1. `React.memo()`
+### 5.2.1. `React.memo()`
 
 To prevent unnecessary renders triggered by a parent component you can use `memo` function. Just wrap your component function as argument to memo function imported from React. To work in all cases Sonar would advise that instead of exporting directly this memo it is better to store it as a const (preferably with the same name as the component) first and then export this const.
 
@@ -284,11 +405,11 @@ It might be tempting to wrap all your component functions in memo. But you shoul
 
 Instead, **use it as high up in the component tree as possible**. Blocking a component execution there also block all child component executions.
 
-### 4.2.2. Avoid component function executions with clever structuring
+### 5.2.2. Avoid component function executions with clever structuring
 
 State changes and reexecutions of child components do **NOT** trigger parent component executions. Knowing that, moving state as low in the tree as possible is preferred.
 
-### 4.2.3. `useCallback()` hook
+### 5.2.3. `useCallback()` hook
 
 In general, `useCallback` is a wrapper around an existing function. It is primarily used together with `React.memo`.
 
@@ -303,7 +424,7 @@ To avoid this, we can let React manage the function's lifecycle by wrapping it i
 
 As long as none of the dependencies change, `useCallback` returns the same function instance on every render. This allows `React.memo` to see that the prop has not changed and avoid unnecessary re-renders.
 
-### 4.2.4. `React.useMemo()`
+### 5.2.4. `React.useMemo()`
 
 Just as you want to prevent component functions with `memo`, you also may want to prevent execution of normal functions that are called inside component functions, unless their import changed. React gives us `useMemo` hook.
 
