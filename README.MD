@@ -18,6 +18,8 @@
     - [3.11.1. Using the ternary operator](#3111-using-the-ternary-operator)
     - [3.11.2. Using logical AND (`&&`)](#3112-using-logical-and-)
     - [3.11.3. Using variables](#3113-using-variables)
+  - [3.12. CSS styling and dynamic styling](#312-css-styling-and-dynamic-styling)
+  - [3.13. Outputting list data automatically](#313-outputting-list-data-automatically)
 - [4. React behind the scenes - optimization techniques](#4-react-behind-the-scenes---optimization-techniques)
   - [4.1. How does React update the DOM?](#41-how-does-react-update-the-dom)
   - [4.2. Optimization](#42-optimization)
@@ -242,6 +244,25 @@ if (selectedTopic) {
 
 return { tabContent };
 ```
+
+## 3.12. CSS styling and dynamic styling
+
+In standard html to change declare class you would use `class` prop. But there is React specific built-in prop `className`. Most of other attributes like `id` and so on are the same in JSX and HTML. Just for this class attribute it's different.
+
+## 3.13. Outputting list data automatically
+
+As React can output array of JSX elements but not array of js objects, we need to transform them to JSX elements. We can achieve that by using `Arrays.map()` method.
+
+```jsx
+// inside renerable content
+{
+  CORE_CONCEPTS.map((conceptItem) => (
+    <CoreConcept {...conceptItem} key={conceptItem.title} />
+  ));
+}
+```
+
+When dynamically outputting a list of elements, every element should receive a unique "key" to help React tell the list items apart.
 
 # 4. React behind the scenes - optimization techniques
 
