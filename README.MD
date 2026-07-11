@@ -28,6 +28,13 @@
   - [4.5. Multiple JSX slots](#45-multiple-jsx-slots)
   - [4.6. Setting component types dynamically](#46-setting-component-types-dynamically)
   - [4.7. Setting default prop values](#47-setting-default-prop-values)
+  - [4.8. Not all content must go into components](#48-not-all-content-must-go-into-components)
+  - [4.9. Public folder](#49-public-folder)
+  - [4.10. When to create a component](#410-when-to-create-a-component)
+  - [4.11. Updating state based on previous state](#411-updating-state-based-on-previous-state)
+    - [4.11.1. Why do you pass a function?](#4111-why-do-you-pass-a-function)
+  - [4.12. Update object-state immutably](#412-update-object-state-immutably)
+  - [4.13. Lifting the state up](#413-lifting-the-state-up)
 - [5. React behind the scenes - optimization techniques](#5-react-behind-the-scenes---optimization-techniques)
   - [5.1. How does React update the DOM?](#51-how-does-react-update-the-dom)
   - [5.2. Optimization](#52-optimization)
@@ -64,6 +71,7 @@ To use import and export in js file you would need to add attribute 'type="modul
 ## 3.1. Components
 
 Reusable building blocks.
+
 ![creating-components](images/image-3.png)
 ![why-components](images/image-4.png)
 ![jsx](images/image-5.png)
@@ -384,6 +392,133 @@ export default function Tabs({ children, buttons, ButtonsContainer = "menu" }) {
   );
 }
 ```
+
+## 4.8. Not all content must go into components
+
+While working in React it is easy to forget that content that displays static data (e.g.: header with a picture) that does not rely on props does not have to be a component. We can just use standard html in index.html.
+
+## 4.9. Public folder
+
+The public/ Folder
+As shown in the previous lecture you can store images in the public/ folder and then directly reference them from inside your index.html or index.css files.
+
+The reason for that is that images (or, in general: files) stored in public/ are made publicly available by the underlying project development server & build process. Just like index.html, those files can directly be visited from inside the browser and can therefore also be requested by other files.
+
+If you try loading localhost:5173/some-image.jpg, you'll be able to see that image (if it exists in the public/ folder, of course).
+
+The src/assets/ Folder
+You can also store images in the src/assets/ folder (or, actually, anywhere in the src folder).
+
+So what's the difference compared to public/?
+
+Any files (of any format) stored in src (or subfolders like src/assets/) are not made available to the public. They can't be accessed by website visitors. If you try loading localhost:5173/src/assets/some-image.jpg, you'll get an error.
+
+Instead, files stored in src/ (and subfolders) can be used in your code files. Images imported into code files are then picked up by the underlying build process, potentially optimized, and kind of "injected" into the public/ folder right before serving the website. Links to those images are automatically generated and used in the places where you referenced the imported images.
+
+Which Folder Should You Use?
+You should use the public/ folder for any images that should not be handled by the build process and that should be generally available. Good candidates are images used directly in the index.html file or favicons.
+
+On the other hand, images that are used inside of components should typically be stored in the src/ folder (e.g., in src/assets/).
+
+## 4.10. When to create a component
+
+when you need to repeat yourself codewise.
+
+## 4.11. Updating state based on previous state
+
+You should **NOT** update state based on the previous value of that state like this:
+
+```jsx
+function handleEditClick() {
+  setIsEditing(!isEditing);
+}
+```
+
+Instead, you should pass a function to that state-updating function:
+
+```jsx
+function handleEditClick() {
+  setIsEditing((editing) => !editing);
+}
+```
+
+This is a strong recommendation by the React team and best practise in real world. It is something you should simply memorize.
+
+![updating-state-based-on-old-state](images/image-15.png)
+
+### 4.11.1. Why do you pass a function?
+
+Because this function you pass will be called by React and it will automatcally get the current state value as an input.
+
+The correct approach might look overly complex and seem to behave the same.
+
+To understand this it is important to know that React behind the scenes in the end is scheduling those state updates you are triggering with those state updating functions, like `setIsEditing`. So this state update is **not performed instantly**, instead it is scheduled by React to be performed in the future. Now, the future will probably be in 1 or 2ms, but it's not instant.
+
+![react-is-scheduling-state-updates](images/image-16.png)
+
+Take this code snippet as an example:
+
+```jsx
+function handleEditClick() {
+  setIsEditing(!isEditing);
+  setIsEditing(!isEditing);
+}
+```
+
+If you don't know about how React works you might not get the result you might expect. Because you might expect that the first `setIsEditing` call is setting `isEditing` to the opposite of it currently is, and since it is `false` by default this should set it to `true`. And since we do the same in the next line we might expect to set it back to false. So you might expect that nothing happens.
+
+But thats not what's happening - we set the value twice to true.
+
+That's why we should pass an updater function to `setIsEditing` instead of a value. React passes the current state as an argument to the updater function, allowing us to calculate the next state from the latest value.
+
+So this snippet will give us the expected result:
+
+```jsx
+function handleEditClick() {
+  // editing => false
+  setIsEditing((editing) => !isEditing);
+  // editing => true
+  setIsEditing((editing) => !isEditing);
+  // editing => false
+}
+```
+
+## 4.12. Update object-state immutably
+
+If your state is an object or array you update that state in immutable way. That means you simply create a copy of the old state and then change that copy instead of existing object or array.
+
+The reason is that if your state is an object or array you're dealing with a reference value in JS, and therefore if you would be updating it like this:
+
+```jsx
+// wrong way of updating state that is an object or array
+function handleSelectSquare(rowIndex, colIndex) {
+  setGameBoard((prevGameBoard) => {
+    prevGameBoard[rowIndex][colIndex] = "X";
+    return prevGameBoard;
+  });
+}
+```
+
+you would be updating the old value in memory immediately, even before this scheduled state update was executed by React. This can lead to strange bugs and side effects if you have multiple places in your application that are scheduling state updates for the same state.
+
+```jsx
+// correct way of updating state that is an object or array
+function handleSelectSquare(rowIndex, colIndex) {
+  setGameBoard((prevGameBoard) => {
+    const updatedBoard = [
+      ...prevGameBoard.map((innerArray) => [...innerArray]),
+    ];
+    updatedBoard[rowIndex][colIndex] = "X";
+    return updatedBoard;
+  });
+}
+```
+
+## 4.13. Lifting the state up
+
+If multiple components need the same information, we need to manage the state in the closest ancestor component, that has access to both components that need that information. Ancestor component will give that information tomcomponents via props.
+
+![lifting-state-up](images/image-17.png)
 
 # 5. React behind the scenes - optimization techniques
 
