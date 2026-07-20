@@ -35,6 +35,9 @@
     - [4.11.1. Why do you pass a function?](#4111-why-do-you-pass-a-function)
   - [4.12. Update object-state immutably](#412-update-object-state-immutably)
   - [4.13. Lifting the state up](#413-lifting-the-state-up)
+    - [4.13.1. Lifting computed values up](#4131-lifting-computed-values-up)
+  - [4.14. Avoid intersecting states](#414-avoid-intersecting-states)
+  - [4.15. Deriving state](#415-deriving-state)
 - [5. React behind the scenes - optimization techniques](#5-react-behind-the-scenes---optimization-techniques)
   - [5.1. How does React update the DOM?](#51-how-does-react-update-the-dom)
   - [5.2. Optimization](#52-optimization)
@@ -519,6 +522,20 @@ function handleSelectSquare(rowIndex, colIndex) {
 If multiple components need the same information, we need to manage the state in the closest ancestor component, that has access to both components that need that information. Ancestor component will give that information tomcomponents via props.
 
 ![lifting-state-up](images/image-17.png)
+
+### 4.13.1. Lifting computed values up
+
+If derived state is needed in parent component it is also common to move code that computes this state up.
+
+## 4.14. Avoid intersecting states
+
+Don't add a state that's managing the same or very similar information like the state you already have in different component. You can for example lift the state up with some changes to avoid that.
+
+## 4.15. Deriving state
+
+It means to instead of managing another state in component, we rather take state from parent component and compute it to achieve desired structure of data.
+
+in React you should manage as little state as needed and try to derive as much information and as many values as possible from that state.
 
 # 5. React behind the scenes - optimization techniques
 
