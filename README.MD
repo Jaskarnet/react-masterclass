@@ -1,4 +1,6 @@
-**Table of contents**
+# React Udemy Course Notes <!-- omit in toc -->
+
+## Table of contents <!-- omit in toc -->
 
 - [1. Setuping react project](#1-setuping-react-project)
 - [2. JavaScript refresher](#2-javascript-refresher)
@@ -38,13 +40,18 @@
     - [4.13.1. Lifting computed values up](#4131-lifting-computed-values-up)
   - [4.14. Avoid intersecting states](#414-avoid-intersecting-states)
   - [4.15. Deriving state](#415-deriving-state)
-- [5. React behind the scenes - optimization techniques](#5-react-behind-the-scenes---optimization-techniques)
-  - [5.1. How does React update the DOM?](#51-how-does-react-update-the-dom)
-  - [5.2. Optimization](#52-optimization)
-    - [5.2.1. `React.memo()`](#521-reactmemo)
-    - [5.2.2. Avoid component function executions with clever structuring](#522-avoid-component-function-executions-with-clever-structuring)
-    - [5.2.3. `useCallback()` hook](#523-usecallback-hook)
-    - [5.2.4. `React.useMemo()`](#524-reactusememo)
+- [5. Styling React Components](#5-styling-react-components)
+  - [5.1. Splitting CSS code across multiple files](#51-splitting-css-code-across-multiple-files)
+  - [5.2. Styling with vanilla CSS](#52-styling-with-vanilla-css)
+    - [5.2.1. Pros](#521-pros)
+    - [5.2.2. Cons](#522-cons)
+- [6. React behind the scenes - optimization techniques](#6-react-behind-the-scenes---optimization-techniques)
+  - [6.1. How does React update the DOM?](#61-how-does-react-update-the-dom)
+  - [6.2. Optimization](#62-optimization)
+    - [6.2.1. `React.memo()`](#621-reactmemo)
+    - [6.2.2. Avoid component function executions with clever structuring](#622-avoid-component-function-executions-with-clever-structuring)
+    - [6.2.3. `useCallback()` hook](#623-usecallback-hook)
+    - [6.2.4. `React.useMemo()`](#624-reactusememo)
 
 # 1. Setuping react project
 
@@ -517,6 +524,46 @@ function handleSelectSquare(rowIndex, colIndex) {
 }
 ```
 
+Here's another example:
+
+```jsx
+// wrong way of updating state that is an object or array
+function App() {
+  const [gameTurns, setGameTurns] = useState([]);
+  const activePlayer = deriveActivePlayer(gameTurns);
+
+  let gameBoard = initialGameBoard;
+  for (const turn of gameTurns) {
+    const { square, player } = turn;
+    const { row, col } = square;
+
+    gameBoard[row][col] = player;
+  }
+  //...
+}
+```
+
+As arrays are references, changing `gameBoard` would also change `initialGameBoard`. Considering that if we would restart the game we would like to go back to `initialGameBoard` that is unintended behavior and often a hard bug to notice.
+
+So better to keep it immutable and deep copy an array:
+
+```jsx
+// correct way of updating state that is an object or array
+function App() {
+  const [gameTurns, setGameTurns] = useState([]);
+  const activePlayer = deriveActivePlayer(gameTurns);
+
+  let gameBoard = [...initialGameBoard.map((col) => [...col])];
+  for (const turn of gameTurns) {
+    const { square, player } = turn;
+    const { row, col } = square;
+
+    gameBoard[row][col] = player;
+  }
+  //...
+}
+```
+
 ## 4.13. Lifting the state up
 
 If multiple components need the same information, we need to manage the state in the closest ancestor component, that has access to both components that need that information. Ancestor component will give that information tomcomponents via props.
@@ -537,15 +584,34 @@ It means to instead of managing another state in component, we rather take state
 
 in React you should manage as little state as needed and try to derive as much information and as many values as possible from that state.
 
-# 5. React behind the scenes - optimization techniques
+# 5. Styling React Components
 
-## 5.1. How does React update the DOM?
+## 5.1. Splitting CSS code across multiple files
+
+One option definetely is to simply add a css file to your project (like index.css), define all your css rules in there using element/id/class selectors. Then import this css file. And in a typical React project, fe. using vite as underlying development and build tool, you can import css files into js files and build tool identify such imports and in the end will make sure that css file that is imported will be injected into webpage (in devtools in elements this file can be seen as style type="text/css"). There can be as many vanilla css files as you want. So you could for example split this one css file into component related css files (in devtools in elements now there will be element for each injected css file).
+
+## 5.2. Styling with vanilla CSS
+
+### 5.2.1. Pros
+
+- **Decoupling** - CSS code is separate from JSX code
+- **Familiarity** - you write CSS as you (maybe) know and (maybe) love it
+- **Low-access collaboration** - CSS can be written by another developer who needs only minimal access to your JSX code
+
+### 5.2.2. Cons
+
+- **No scoping** — CSS rules are not scoped to components and may clash across components (e.g. the same class name used in different components for different purposes)
+- **CSS knowledge required** — you need to know CSS
+
+# 6. React behind the scenes - optimization techniques
+
+## 6.1. How does React update the DOM?
 
 It updates from top to bottom of the tree. The App component is usally the top component. If any custom component is in renderable JSX part of it then it will render (execute component function) of this component as well and so on.
 
-## 5.2. Optimization
+## 6.2. Optimization
 
-### 5.2.1. `React.memo()`
+### 6.2.1. `React.memo()`
 
 To prevent unnecessary renders triggered by a parent component you can use `memo` function. Just wrap your component function as argument to memo function imported from React. To work in all cases Sonar would advise that instead of exporting directly this memo it is better to store it as a const (preferably with the same name as the component) first and then export this const.
 
@@ -557,11 +623,11 @@ It might be tempting to wrap all your component functions in memo. But you shoul
 
 Instead, **use it as high up in the component tree as possible**. Blocking a component execution there also block all child component executions.
 
-### 5.2.2. Avoid component function executions with clever structuring
+### 6.2.2. Avoid component function executions with clever structuring
 
 State changes and reexecutions of child components do **NOT** trigger parent component executions. Knowing that, moving state as low in the tree as possible is preferred.
 
-### 5.2.3. `useCallback()` hook
+### 6.2.3. `useCallback()` hook
 
 In general, `useCallback` is a wrapper around an existing function. It is primarily used together with `React.memo`.
 
@@ -576,7 +642,7 @@ To avoid this, we can let React manage the function's lifecycle by wrapping it i
 
 As long as none of the dependencies change, `useCallback` returns the same function instance on every render. This allows `React.memo` to see that the prop has not changed and avoid unnecessary re-renders.
 
-### 5.2.4. `React.useMemo()`
+### 6.2.4. `React.useMemo()`
 
 Just as you want to prevent component functions with `memo`, you also may want to prevent execution of normal functions that are called inside component functions, unless their import changed. React gives us `useMemo` hook.
 
