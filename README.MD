@@ -659,7 +659,7 @@ In devtools you can see that the final class name will be different:
 ### 5.3.1. Pros
 
 > [!NOTE]
-> Inherits all three Vanilla CSS pros (decoupling, familiarity, low-access collaboration).
+> **Decoupling**, **Familiarity**, and **Low-access collaboration** are the same as Vanilla CSS.
 
 - **Decoupling** - CSS code is separate from JSX code
 - **Familiarity** - you write CSS as you (maybe) know and (maybe) love it
@@ -667,6 +667,9 @@ In devtools you can see that the final class name will be different:
 - **Scoping** - CSS classes are scoped to the component (files) which import them, so there are no CSS class name clashes
 
 ### 5.3.2. Cons
+
+> [!NOTE]
+> **CSS knowledge required** is the same as Vanilla CSS.
 
 - **CSS knowledge required** - you need to know CSS
 - **File sprawl** - you may end up with many relatively small CSS files in your project
