@@ -42,9 +42,12 @@
   - [4.15. Deriving state](#415-deriving-state)
 - [5. Styling React Components](#5-styling-react-components)
   - [5.1. Splitting CSS code across multiple files](#51-splitting-css-code-across-multiple-files)
-  - [5.2. Styling with vanilla CSS](#52-styling-with-vanilla-css)
+  - [5.2. Vanilla CSS](#52-vanilla-css)
     - [5.2.1. Pros](#521-pros)
     - [5.2.2. Cons](#522-cons)
+  - [5.3. CSS modules](#53-css-modules)
+    - [5.3.1. Pros](#531-pros)
+    - [5.3.2. Cons](#532-cons)
 - [6. React behind the scenes - optimization techniques](#6-react-behind-the-scenes---optimization-techniques)
   - [6.1. How does React update the DOM?](#61-how-does-react-update-the-dom)
   - [6.2. Optimization](#62-optimization)
@@ -590,7 +593,7 @@ in React you should manage as little state as needed and try to derive as much i
 
 One option definetely is to simply add a css file to your project (like index.css), define all your css rules in there using element/id/class selectors. Then import this css file. And in a typical React project, fe. using vite as underlying development and build tool, you can import css files into js files and build tool identify such imports and in the end will make sure that css file that is imported will be injected into webpage (in devtools in elements this file can be seen as style type="text/css"). There can be as many vanilla css files as you want. So you could for example split this one css file into component related css files (in devtools in elements now there will be element for each injected css file).
 
-## 5.2. Styling with vanilla CSS
+## 5.2. Vanilla CSS
 
 ### 5.2.1. Pros
 
@@ -600,8 +603,73 @@ One option definetely is to simply add a css file to your project (like index.cs
 
 ### 5.2.2. Cons
 
-- **No scoping** — CSS rules are not scoped to components and may clash across components (e.g. the same class name used in different components for different purposes)
-- **CSS knowledge required** — you need to know CSS
+- **No scoping** - CSS rules are not scoped to components and may clash across components (e.g. the same class name used in different components for different purposes)
+- **CSS knowledge required** - you need to know CSS
+
+## 5.3. CSS modules
+
+Allows to write vanilla CSS rules with file scoping.
+
+It's not a default browser or JS feature. It is an approach where build tools will transform your CSS class names, and only those, to class names that are guaranteed to be unique per file.
+
+To use this you need proper build tool like vite.
+Then to create scoped css file it must be named like this:
+
+```
+Header.module.css
+```
+
+This `<file-name>.module.css` name convention is a signal to build tool to process this file slighty different.
+
+Importing it to jsx fila also looks different. Rather than this:
+
+```jsx
+import "./Header.css"; // vanilla css import
+```
+
+it should look now like this:
+
+```jsx
+import classes from "./Header.module.css"; // module css import
+```
+
+Now we have to import something from this module file, and that something is JS object that will be created by underlying build process. It can be named 'styles' or 'classes' or whatever you want. But 'classes' is a fitting name because this object will contain your class names transformed to unique class names. Then u can use this class to access its properties to style components like this:
+
+```tsx
+import logo from "../assets/logo.png";
+import classes from "./Header.module.css";
+
+export default function Header() {
+  return (
+    // 'paragraph' is css class name that you can access through classes object
+    <header>
+      <img src={logo} alt="A canvas" />
+      <h1>ReactArt</h1>
+      <p className={classes.paragraph}>
+        A community of artists and art-lovers.
+      </p>
+    </header>
+  );
+}
+```
+
+In devtools you can see that the final class name will be different:
+![css-module-class-name](images/image-18.png)
+
+### 5.3.1. Pros
+
+> [!NOTE]
+> Inherits all three Vanilla CSS pros (decoupling, familiarity, low-access collaboration).
+
+- **Decoupling** - CSS code is separate from JSX code
+- **Familiarity** - you write CSS as you (maybe) know and (maybe) love it
+- **Low-access collaboration** - CSS can be written by another developer who needs only minimal access to your JSX code
+- **Scoping** - CSS classes are scoped to the component (files) which import them, so there are no CSS class name clashes
+
+### 5.3.2. Cons
+
+- **CSS knowledge required** - you need to know CSS
+- **File sprawl** - you may end up with many relatively small CSS files in your project
 
 # 6. React behind the scenes - optimization techniques
 
