@@ -48,13 +48,23 @@
   - [5.3. CSS modules](#53-css-modules)
     - [5.3.1. Pros](#531-pros)
     - [5.3.2. Cons](#532-cons)
-- [6. React behind the scenes - optimization techniques](#6-react-behind-the-scenes---optimization-techniques)
-  - [6.1. How does React update the DOM?](#61-how-does-react-update-the-dom)
-  - [6.2. Optimization](#62-optimization)
-    - [6.2.1. `React.memo()`](#621-reactmemo)
-    - [6.2.2. Avoid component function executions with clever structuring](#622-avoid-component-function-executions-with-clever-structuring)
-    - [6.2.3. `useCallback()` hook](#623-usecallback-hook)
-    - [6.2.4. `React.useMemo()`](#624-reactusememo)
+  - [5.4. styled-components third party package](#54-styled-components-third-party-package)
+    - [5.4.1. Pros](#541-pros)
+    - [5.4.2. Cons](#542-cons)
+  - [5.5. Tailwind CSS](#55-tailwind-css)
+    - [5.5.1. Adding custom font](#551-adding-custom-font)
+    - [5.5.2. Media queries and pseudo selectors](#552-media-queries-and-pseudo-selectors)
+    - [5.5.3. Pros](#553-pros)
+    - [5.5.4. Cons](#554-cons)
+- [6. Debugging React apps](#6-debugging-react-apps)
+  - [6.1. React strict mode](#61-react-strict-mode)
+- [7. React behind the scenes - optimization techniques](#7-react-behind-the-scenes---optimization-techniques)
+  - [7.1. How does React update the DOM?](#71-how-does-react-update-the-dom)
+  - [7.2. Optimization](#72-optimization)
+    - [7.2.1. `React.memo()`](#721-reactmemo)
+    - [7.2.2. Avoid component function executions with clever structuring](#722-avoid-component-function-executions-with-clever-structuring)
+    - [7.2.3. `useCallback()` hook](#723-usecallback-hook)
+    - [7.2.4. `React.useMemo()`](#724-reactusememo)
 
 # 1. Setuping react project
 
@@ -674,15 +684,457 @@ In devtools you can see that the final class name will be different:
 - **CSS knowledge required** - you need to know CSS
 - **File sprawl** - you may end up with many relatively small CSS files in your project
 
-# 6. React behind the scenes - optimization techniques
+## 5.4. styled-components third party package
 
-## 6.1. How does React update the DOM?
+install:
+
+```bash
+npm install styled-components
+```
+
+use:
+
+```jsx
+import { styled } from "styled-components";
+```
+
+`styled` is JS object that consists properties of html elements
+
+You can style in component using special syntax. It looks like this:
+
+```jsx
+styled.div``;
+```
+
+Notice two backticks at the end. This syntax is **tagged template** which is a regular JS feature (even though you may never heard about it).
+
+In the end tagged template is like a function which receives template literal as an input. In our case this template literal should receive all the styles you want to apply to this div. Reminder that template literals can be multiline.
+
+```jsx
+styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+`;
+```
+
+We can store this in const or variable and use it as html tag:
+
+```jsx
+const ControlContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+`;
+...
+<ControlContainer><ControlContainer/>
+```
+
+Under the hood this library just creates classes for html elements.
+
+The elements you create using styled-components also forward all of the props to the built-in html component. So you can use inline styled with styled-components to, for example, conditinally assign a class to an element.
+
+```jsx
+<Label className={`label ${emailNotValid ? 'invalid' : ''}`}>
+```
+
+Even though you can do that (mix vanilla/inline CSS with styled-components) you would typically go for one solution to use for everything. So typically we don't want to add CSS classes like this.
+
+Instead we can do it using styled-components by adding a special prop e.g. `invalid` and then use it in styled component.
+
+This can be achieved by using dynamic value inside template literal that's a part of tagged template. With styled-components this dynamic value inside template literal should be a function This function will be executed and handled by styled-components package. To help us derive the value we want to achieve the styled-components package **will forward props object as an argument to this function**.
+
+So we could use it like this:
+
+```jsx
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: ${({ invalid }) => (invalid ? "#f87171" : "#6b7280")};
+`;
+```
+
+If prop name used for styling has the same name as built-in prop of built-in component, then we could achieve unwanted behavior, such as with this `invalid` prop error message:
+![error-transient-prop](images/image-19.png)
+
+So for props used only for styling it is common convention to prefix prop names with a `$` sign.
+
+```JSX
+<Label $invalid={emailNotValid}>Email</Label>
+```
+
+This is still a valid prop name allowed in JS, but it won't clash with built-in props.
+
+To handle nested rules and media queries, instead of rules written in plain CSS:
+
+```css
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+header img {
+  object-fit: contain;
+  margin-bottom: 2rem;
+  width: 11rem;
+  height: 11rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+  color: #9a3412;
+  font-family: "Pacifico", cursive;
+  margin: 0;
+}
+
+header p {
+  text-align: center;
+  color: #a39191;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  header {
+    margin-bottom: 4rem;
+  }
+
+  header h1 {
+    font-size: 2.25rem;
+  }
+}
+```
+
+It can be done in styled component like this:
+
+```jsx
+import { styled } from "styled-components";
+
+const StyledHeader = styled.header`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+
+  & img {
+    object-fit: contain;
+    margin-bottom: 2rem;
+    width: 11rem;
+    height: 11rem;
+  }
+
+  & h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.4em;
+    text-align: center;
+    text-transform: uppercase;
+    color: #9a3412;
+    font-family: "Pacifico", cursive;
+    margin: 0;
+  }
+
+  & p {
+    text-align: center;
+    color: #a39191;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    margin-bottom: 4rem;
+
+    & h1 {
+      font-size: 2.25rem;
+    }
+  }
+`;
+```
+
+Where `&` sign means _this_ component (so the header in this case).
+
+For pseudoselectors it is similar. So instead of this:
+
+```css
+.button {
+  padding: 1rem 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  color: #1f2937;
+  background-color: #f0b322;
+  border-radius: 6px;
+  border: none;
+}
+
+.button:hover {
+  background-color: #f0920e;
+}
+```
+
+It can be done in styled component like this:
+
+```jsx
+import { styled } from "styled-components";
+
+const Button = styled.button`
+  padding: 1rem 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  color: #1f2937;
+  background-color: #f0b322;
+  border-radius: 6px;
+  border: none;
+
+  &:hover {
+    background-color: #f0920e;
+  }
+`;
+```
+
+To reuse styled-components you can move them into separate file. So e.g. `Button.jsx` could look like this:
+
+```jsx
+import { styled } from "styled-components";
+
+const Button = styled.button`
+  padding: 1rem 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  color: #1f2937;
+  background-color: #f0b322;
+  border-radius: 6px;
+  border: none;
+
+  &:hover {
+    background-color: #f0920e;
+  }
+`;
+
+export default Button;
+```
+
+and then just simply import whenever you need this component:
+
+```jsx
+import Button from "./Button.jsx";
+```
+
+### 5.4.1. Pros
+
+- **No extensive CSS knowledge required** - You don't need to know a lot about CSS
+- **Rapid development** - Quickly build and style components
+- **No style clashes** - Utilities avoid custom CSS rule conflicts
+- **Highly configurable** - Easily customized and extended through the theme
+
+### 5.4.2. Cons
+
+- **Long `className` values** - Relatively long `className` values
+- **JSX & styling coupled** - Any style changes require editing JSX
+- **Wrapper components** - You end up with many relatively small "wrapper components" OR lots of copy and pasting the same style
+
+## 5.5. Tailwind CSS
+
+CSS framework that can be used in any web project. It is not focused on React but it works really well with React. TailWind is all about adding tiny utility CSS classes to HTML elements to apply styles step by step. In addition Tailwind also sets up some base styles that will affect the overall document.
+
+When you see it for the first time it can look quite intimidating and ugly. After all you are going to add a lot of css classes into your JSX code.
+
+Actually it is pretty convienient because you don't need to know CSS in order to use it. That's the idea behind this framework.
+
+Here's [installation guide](https://tailwindcss.com/docs/installation/using-vite) for different build tools. You should go through those setup steps.
+
+These steps myay change over time, but generally it involves these steps:
+
+For an existing project you should run this command to install package:
+
+```shell
+npm install tailwindcss @tailwindcss/vite
+```
+
+Add the @tailwindcss/vite plugin to Vite configuration
+
+```jsx
+import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [tailwindcss()],
+});
+```
+
+Install **Tailwind CSS IntelliSense** in VSCode
+
+### 5.5.1. Adding custom font
+
+In index.css import this:
+
+```
+@theme {
+  --font-title: "Pacifico", cursive;
+}
+```
+
+And use class `font-title` in text you want to update
+
+```jsx
+import logo from "../assets/logo.png";
+
+export default function Header() {
+  return (
+    <header className="flex flex-col items-center mt-8 mb-16">
+      <img src={logo} alt="A canvas" className="mb-8 w-44 object-contain" />
+      <h1 className="text-4xl font-semibold tracking-widest text-center uppercase text-amber-800 font-title">
+        ReactArt
+      </h1>
+      <p className="text-stone-500">A community of artists and art-lovers.</p>
+    </header>
+  );
+}
+```
+
+### 5.5.2. Media queries and pseudo selectors
+
+Tailwind support responsive design, for example to the width of the browser window. It has built-in prefixes to use.
+
+Tailwind uses a mobile-first breakpoint system, similar to what you might be used to in other frameworks like Bootstrap.
+
+What this means is that unprefixed utilities (like uppercase) take effect on all screen sizes, while prefixed utilities (like md:uppercase) only take effect at the specified breakpoint and above.
+
+Tailwind CSS breakpoints:
+
+| Breakpoint prefix |  Minimum width | CSS                               |
+| ----------------- | -------------: | --------------------------------- |
+| **`sm`**          |  40rem (640px) | `@media (width >= 40rem) { ... }` |
+| **`md`**          |  48rem (768px) | `@media (width >= 48rem) { ... }` |
+| **`lg`**          | 64rem (1024px) | `@media (width >= 64rem) { ... }` |
+| **`xl`**          | 80rem (1280px) | `@media (width >= 80rem) { ... }` |
+| **`2xl`**         | 96rem (1536px) | `@media (width >= 96rem) { ... }` |
+
+Then when specyfying a class for an element you can prefix it and use colon to declare such media query. For example, if you want a smaller margin bottom all of the devices to medium you could write something like this:
+
+```jsx
+export default function Header() {
+  return (
+    <header className="flex flex-col items-center mt-8 md-8 md:mb-16"></header>
+  );
+}
+```
+
+Same will work with `hover:` and `focus:` for example.
+
+### 5.5.3. Pros
+
+- You don't need to know (a lot about) CSS
+- Rapid development
+- No style clashes between components since you don't define any CSS rules
+- highly configurable and extensible
+
+### 5.5.4. Cons
+
+- Relatively long className values
+- any style changes require editing JSX
+- you end up with many relatively small "wrapper components" OR lots of copy and pasting
+
+# 6. Debugging React apps
+
+## 6.1. React strict mode
+
+Using strict mode typically begins in `index.jsx`, though you can enable it just for parts of your application. Strict mode in the end is simply a component you import from react.
+
+```jsx
+import { StrictMode } from "react";
+```
+
+It is a component provided by React that's meant to be wrapped around other components, for example around the `App` component
+
+```jsx
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+`StrictMode` does a couple of things behind the scenes that can help us catch certain problems in our app. For example, one of the most inportant thing `StrictMode` component does, is that it will execute every component function twice instead of just once (it only does that in development). Thanks to that it might be more obvious when something isn't properly cleared, like assigning empty array to const outside of component function (so it does not get cleared the second time component is rendered).
+
+```jsx
+// example of silent error that's easier to debug with StrictMode
+import { calculateInvestmentResults, formatter } from "../util/investment.js";
+
+const results = []; // results outside of component function get's called only once
+
+export default function Results({ input }) {
+  // const results = []; <--- emptying results should happen here
+  calculateInvestmentResults(input, results);
+  const initialInvestment =
+    results[0].valueEndOfYear -
+    results[0].interest -
+    results[0].annualInvestment;
+
+  return (
+    <table id="result">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Investment Value</th>
+          <th>Interest (Year)</th>
+          <th>Total Interest</th>
+          <th>Invested Capital</th>
+        </tr>
+      </thead>
+      <tbody>
+        {results.map((yearData) => {
+          const totalInterest =
+            yearData.valueEndOfYear -
+            yearData.annualInvestment * yearData.year -
+            initialInvestment;
+          const totalAmountInvested = yearData.valueEndOfYear - totalInterest;
+
+          return (
+            <tr key={yearData.year}>
+              <td>{yearData.year}</td>
+              <td>{formatter.format(yearData.valueEndOfYear)}</td>
+              <td>{formatter.format(yearData.interest)}</td>
+              <td>{formatter.format(totalInterest)}</td>
+              <td>{formatter.format(totalAmountInvested)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+```
+
+Thanks to strict mode now bug is more visible as result is displayed twice as results is properly cleared:
+
+![strict-mode-result-displayed-twice](images/image-20.png)
+
+# 7. React behind the scenes - optimization techniques
+
+## 7.1. How does React update the DOM?
 
 It updates from top to bottom of the tree. The App component is usally the top component. If any custom component is in renderable JSX part of it then it will render (execute component function) of this component as well and so on.
 
-## 6.2. Optimization
+## 7.2. Optimization
 
-### 6.2.1. `React.memo()`
+### 7.2.1. `React.memo()`
 
 To prevent unnecessary renders triggered by a parent component you can use `memo` function. Just wrap your component function as argument to memo function imported from React. To work in all cases Sonar would advise that instead of exporting directly this memo it is better to store it as a const (preferably with the same name as the component) first and then export this const.
 
@@ -694,11 +1146,11 @@ It might be tempting to wrap all your component functions in memo. But you shoul
 
 Instead, **use it as high up in the component tree as possible**. Blocking a component execution there also block all child component executions.
 
-### 6.2.2. Avoid component function executions with clever structuring
+### 7.2.2. Avoid component function executions with clever structuring
 
 State changes and reexecutions of child components do **NOT** trigger parent component executions. Knowing that, moving state as low in the tree as possible is preferred.
 
-### 6.2.3. `useCallback()` hook
+### 7.2.3. `useCallback()` hook
 
 In general, `useCallback` is a wrapper around an existing function. It is primarily used together with `React.memo`.
 
@@ -713,7 +1165,7 @@ To avoid this, we can let React manage the function's lifecycle by wrapping it i
 
 As long as none of the dependencies change, `useCallback` returns the same function instance on every render. This allows `React.memo` to see that the prop has not changed and avoid unnecessary re-renders.
 
-### 6.2.4. `React.useMemo()`
+### 7.2.4. `React.useMemo()`
 
 Just as you want to prevent component functions with `memo`, you also may want to prevent execution of normal functions that are called inside component functions, unless their import changed. React gives us `useMemo` hook.
 
