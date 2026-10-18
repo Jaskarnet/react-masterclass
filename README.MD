@@ -2,69 +2,71 @@
 
 ## Table of contents <!-- omit in toc -->
 
-- [1. Setuping react project](#1-setuping-react-project)
-- [2. JavaScript refresher](#2-javascript-refresher)
-- [3. React Essentials](#3-react-essentials)
-  - [3.1. Components](#31-components)
-  - [3.2. index.jsx](#32-indexjsx)
-  - [3.3. Built-in vs custom components](#33-built-in-vs-custom-components)
-  - [3.4. Dynamic values inside JSX](#34-dynamic-values-inside-jsx)
-  - [3.5. Loading images](#35-loading-images)
-  - [3.6. Props](#36-props)
-  - [3.7. Project Structure](#37-project-structure)
-  - [3.8. Component composition - special `children` prop](#38-component-composition---special-children-prop)
-  - [3.9. Reacting to events](#39-reacting-to-events)
-    - [3.9.1. `onClick` prop](#391-onclick-prop)
-  - [3.10. State](#310-state)
-  - [3.11. Rendering output conditionally](#311-rendering-output-conditionally)
-    - [3.11.1. Using the ternary operator](#3111-using-the-ternary-operator)
-    - [3.11.2. Using logical AND (`&&`)](#3112-using-logical-and-)
-    - [3.11.3. Using variables](#3113-using-variables)
-  - [3.12. CSS styling and dynamic styling](#312-css-styling-and-dynamic-styling)
-  - [3.13. Outputting list data automatically](#313-outputting-list-data-automatically)
-- [4. React Essentials - Deep Dive](#4-react-essentials---deep-dive)
-  - [4.1. You don't have to use JSX](#41-you-dont-have-to-use-jsx)
-  - [4.2. Working with Fragments](#42-working-with-fragments)
-  - [4.3. When should you split components?](#43-when-should-you-split-components)
-  - [4.4. Props are not forwarded automatically](#44-props-are-not-forwarded-automatically)
-  - [4.5. Multiple JSX slots](#45-multiple-jsx-slots)
-  - [4.6. Setting component types dynamically](#46-setting-component-types-dynamically)
-  - [4.7. Setting default prop values](#47-setting-default-prop-values)
-  - [4.8. Not all content must go into components](#48-not-all-content-must-go-into-components)
-  - [4.9. Public folder](#49-public-folder)
-  - [4.10. When to create a component](#410-when-to-create-a-component)
-  - [4.11. Updating state based on previous state](#411-updating-state-based-on-previous-state)
-    - [4.11.1. Why do you pass a function?](#4111-why-do-you-pass-a-function)
-  - [4.12. Update object-state immutably](#412-update-object-state-immutably)
-  - [4.13. Lifting the state up](#413-lifting-the-state-up)
-    - [4.13.1. Lifting computed values up](#4131-lifting-computed-values-up)
-  - [4.14. Avoid intersecting states](#414-avoid-intersecting-states)
-  - [4.15. Deriving state](#415-deriving-state)
-- [5. Styling React Components](#5-styling-react-components)
-  - [5.1. Splitting CSS code across multiple files](#51-splitting-css-code-across-multiple-files)
-  - [5.2. Vanilla CSS](#52-vanilla-css)
-    - [5.2.1. Pros](#521-pros)
-    - [5.2.2. Cons](#522-cons)
-  - [5.3. CSS modules](#53-css-modules)
-    - [5.3.1. Pros](#531-pros)
-    - [5.3.2. Cons](#532-cons)
-  - [5.4. styled-components third party package](#54-styled-components-third-party-package)
-    - [5.4.1. Pros](#541-pros)
-    - [5.4.2. Cons](#542-cons)
-  - [5.5. Tailwind CSS](#55-tailwind-css)
-    - [5.5.1. Adding custom font](#551-adding-custom-font)
-    - [5.5.2. Media queries and pseudo selectors](#552-media-queries-and-pseudo-selectors)
-    - [5.5.3. Pros](#553-pros)
-    - [5.5.4. Cons](#554-cons)
-- [6. Debugging React apps](#6-debugging-react-apps)
-  - [6.1. React strict mode](#61-react-strict-mode)
-- [7. React behind the scenes - optimization techniques](#7-react-behind-the-scenes---optimization-techniques)
-  - [7.1. How does React update the DOM?](#71-how-does-react-update-the-dom)
-  - [7.2. Optimization](#72-optimization)
-    - [7.2.1. `React.memo()`](#721-reactmemo)
-    - [7.2.2. Avoid component function executions with clever structuring](#722-avoid-component-function-executions-with-clever-structuring)
-    - [7.2.3. `useCallback()` hook](#723-usecallback-hook)
-    - [7.2.4. `React.useMemo()`](#724-reactusememo)
+* [1. Setuping react project](#1-setuping-react-project)
+* [2. JavaScript refresher](#2-javascript-refresher)
+* [3. React Essentials](#3-react-essentials)
+  * [3.1. Components](#31-components)
+  * [3.2. index.jsx](#32-indexjsx)
+  * [3.3. Built-in vs custom components](#33-built-in-vs-custom-components)
+  * [3.4. Dynamic values inside JSX](#34-dynamic-values-inside-jsx)
+  * [3.5. Loading images](#35-loading-images)
+  * [3.6. Props](#36-props)
+  * [3.7. Project Structure](#37-project-structure)
+  * [3.8. Component composition - special `children` prop](#38-component-composition---special-children-prop)
+  * [3.9. Reacting to events](#39-reacting-to-events)
+    * [3.9.1. `onClick` prop](#391-onclick-prop)
+  * [3.10. State](#310-state)
+  * [3.11. Rendering output conditionally](#311-rendering-output-conditionally)
+    * [3.11.1. Using the ternary operator](#3111-using-the-ternary-operator)
+    * [3.11.2. Using logical AND (`&&`)](#3112-using-logical-and-)
+    * [3.11.3. Using variables](#3113-using-variables)
+  * [3.12. CSS styling and dynamic styling](#312-css-styling-and-dynamic-styling)
+  * [3.13. Outputting list data automatically](#313-outputting-list-data-automatically)
+* [4. React Essentials - Deep Dive](#4-react-essentials---deep-dive)
+  * [4.1. You don't have to use JSX](#41-you-dont-have-to-use-jsx)
+  * [4.2. Working with Fragments](#42-working-with-fragments)
+  * [4.3. When should you split components?](#43-when-should-you-split-components)
+  * [4.4. Props are not forwarded automatically](#44-props-are-not-forwarded-automatically)
+  * [4.5. Multiple JSX slots](#45-multiple-jsx-slots)
+  * [4.6. Setting component types dynamically](#46-setting-component-types-dynamically)
+  * [4.7. Setting default prop values](#47-setting-default-prop-values)
+  * [4.8. Not all content must go into components](#48-not-all-content-must-go-into-components)
+  * [4.9. Public folder](#49-public-folder)
+  * [4.10. When to create a component](#410-when-to-create-a-component)
+  * [4.11. Updating state based on previous state](#411-updating-state-based-on-previous-state)
+    * [4.11.1. Why do you pass a function?](#4111-why-do-you-pass-a-function)
+  * [4.12. Update object-state immutably](#412-update-object-state-immutably)
+  * [4.13. Lifting the state up](#413-lifting-the-state-up)
+    * [4.13.1. Lifting computed values up](#4131-lifting-computed-values-up)
+  * [4.14. Avoid intersecting states](#414-avoid-intersecting-states)
+  * [4.15. Deriving state](#415-deriving-state)
+* [5. Styling React Components](#5-styling-react-components)
+  * [5.1. Splitting CSS code across multiple files](#51-splitting-css-code-across-multiple-files)
+  * [5.2. Vanilla CSS](#52-vanilla-css)
+    * [5.2.1. Pros](#521-pros)
+    * [5.2.2. Cons](#522-cons)
+  * [5.3. CSS modules](#53-css-modules)
+    * [5.3.1. Pros](#531-pros)
+    * [5.3.2. Cons](#532-cons)
+  * [5.4. styled-components third party package](#54-styled-components-third-party-package)
+    * [5.4.1. Pros](#541-pros)
+    * [5.4.2. Cons](#542-cons)
+  * [5.5. Tailwind CSS](#55-tailwind-css)
+    * [5.5.1. Adding custom font](#551-adding-custom-font)
+    * [5.5.2. Media queries and pseudo selectors](#552-media-queries-and-pseudo-selectors)
+    * [5.5.3. Pros](#553-pros)
+    * [5.5.4. Cons](#554-cons)
+* [6. Debugging React apps](#6-debugging-react-apps)
+  * [6.1. React strict mode](#61-react-strict-mode)
+* [7. Refs and portals](#7-refs-and-portals)
+  * [7.1. Refs](#71-refs)
+* [8. React behind the scenes - optimization techniques](#8-react-behind-the-scenes---optimization-techniques)
+  * [8.1. How does React update the DOM?](#81-how-does-react-update-the-dom)
+  * [8.2. Optimization](#82-optimization)
+    * [8.2.1. `React.memo()`](#821-reactmemo)
+    * [8.2.2. Avoid component function executions with clever structuring](#822-avoid-component-function-executions-with-clever-structuring)
+    * [8.2.3. `useCallback()` hook](#823-usecallback-hook)
+    * [8.2.4. `React.useMemo()`](#824-reactusememo)
 
 # 1. Setuping react project
 
@@ -1126,15 +1128,145 @@ Thanks to strict mode now bug is more visible as result is displayed twice as re
 
 ![strict-mode-result-displayed-twice](images/image-20.png)
 
-# 7. React behind the scenes - optimization techniques
+# 7. Refs and portals
 
-## 7.1. How does React update the DOM?
+Advanced DOM access and value management
+
+- Accessing **DOM Elements** with **Refs**
+- **Managing Values** with Refs (that shouldn't be state)
+- **Exposing API Functions** from Components
+- **Detaching DOM Rendering** from JSX Structure with **Portals**
+
+## 7.1. Refs
+
+**Example task**:
+Create a Player component that read the value that is entered into input field at the point of time where button is pressed.
+
+With current knowledge we would lean to two-way binding which looks like this:
+
+```jsx
+import { useState } from "react";
+
+export default function Player() {
+  const [enteredPlayerName, setEnteredPlayerName] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleChange(event) {
+    setSubmitted(false);
+    setEnteredPlayerName(event.target.value);
+  }
+
+  function handleClick() {
+    setSubmitted(true);
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {submitted ? enteredPlayerName : "unknown entity"}</h2>
+      <p>
+        <input type="text" onChange={handleChange} value={enteredPlayerName} />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+```
+
+Using old way of two-way binding seems like a lot of work for simple task, as we need to manage entered value (`enteredPlayerName` state) with every key stroke (`onChange` prop) and we need second state just to know whether button was pressed or not.
+
+---
+
+**We can simplify this by using ref.**
+
+Ref in React is a value, just as state or variable, but it is special kind of value - managed in React in a special way.
+
+To create such a ref value you need to import `useRef` hook.
+
+```jsx
+import { useRef } from "react";
+```
+
+This is yet another hook function which, like all hook functions, must be called inside of a component function (or inside of a custom hook - explained later in the course).
+
+Then you create ref value like this and can store it in a constant or variable with any name you want.
+
+```jsx
+const playerName = useRef();
+```
+
+One thing you can do with refs, and probably the thing you will be doing the most with them, is to connect them to jsx elements. And you can do that with the special prop that's supported by all React components automatically out of the box. The `ref` prop.
+
+```jsx
+<input
+  ref={playerName}
+  type="text"
+  onChange={handleChange}
+  value={enteredPlayerName}
+/>
+```
+
+`ref` prop takes ref value as an input.
+
+In example this input component is in the end connected to this ref.
+
+How does that connection help us?
+
+Well, we can now use this ref value for example in `handleClick` to access the underlying connected element.
+
+So through `playerName` we can access input element because playerName is connected to it through the ref prop.
+
+So for example in the `handleClick` function we can access the input element, though it's worth noting that for all these ref values created with `useRef` you first have to access the `current` property. So this ref value you are getting back from `useRef` will always be a js object that will always have a current property (and only this property) and it is in this current property that the actual ref value will be stored (in this case input element).
+
+And therefore using this ref we can use all the methods and properties that are exposed by that input HTML element. And it really is native HTML element, to learn what method and properties are exposed by it you can visit [mdn docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input).
+
+For input one of the properties is value. So we can access this property to set player name on button click.
+
+```jsx
+function handleClick() {
+  setEnteredPlayerName(playerName.current.value);
+}
+```
+
+So final Player component using refs will look like this:
+
+```jsx
+import { useRef, useState } from "react";
+
+export default function Player() {
+  const playerName = useRef();
+  const [enteredPlayerName, setEnteredPlayerName] = useState(null);
+
+  function handleClick() {
+    setEnteredPlayerName(playerName.current.value);
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {enteredPlayerName ?? "unknown entity"}</h2>
+      <p>
+        <input ref={playerName} type="text" />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+```
+
+Thanks to this we don't need to log that value on every keystroke anymore. So no need for `handleChange` function. No need for `submitted` state. And just keep `playerName` ref and `enteredPlayerName` state.
+
+in the input component also there is no need for `onChange` and `value` props anymore.
+
+Ref feature exists for use cases like this, where you just want to read a value from an input field for example. It can help save a lot of code and lead to leaner components.
+
+# 8. React behind the scenes - optimization techniques
+
+## 8.1. How does React update the DOM?
 
 It updates from top to bottom of the tree. The App component is usally the top component. If any custom component is in renderable JSX part of it then it will render (execute component function) of this component as well and so on.
 
-## 7.2. Optimization
+## 8.2. Optimization
 
-### 7.2.1. `React.memo()`
+### 8.2.1. `React.memo()`
 
 To prevent unnecessary renders triggered by a parent component you can use `memo` function. Just wrap your component function as argument to memo function imported from React. To work in all cases Sonar would advise that instead of exporting directly this memo it is better to store it as a const (preferably with the same name as the component) first and then export this const.
 
@@ -1146,11 +1278,11 @@ It might be tempting to wrap all your component functions in memo. But you shoul
 
 Instead, **use it as high up in the component tree as possible**. Blocking a component execution there also block all child component executions.
 
-### 7.2.2. Avoid component function executions with clever structuring
+### 8.2.2. Avoid component function executions with clever structuring
 
 State changes and reexecutions of child components do **NOT** trigger parent component executions. Knowing that, moving state as low in the tree as possible is preferred.
 
-### 7.2.3. `useCallback()` hook
+### 8.2.3. `useCallback()` hook
 
 In general, `useCallback` is a wrapper around an existing function. It is primarily used together with `React.memo`.
 
@@ -1165,7 +1297,7 @@ To avoid this, we can let React manage the function's lifecycle by wrapping it i
 
 As long as none of the dependencies change, `useCallback` returns the same function instance on every render. This allows `React.memo` to see that the prop has not changed and avoid unnecessary re-renders.
 
-### 7.2.4. `React.useMemo()`
+### 8.2.4. `React.useMemo()`
 
 Just as you want to prevent component functions with `memo`, you also may want to prevent execution of normal functions that are called inside component functions, unless their import changed. React gives us `useMemo` hook.
 
